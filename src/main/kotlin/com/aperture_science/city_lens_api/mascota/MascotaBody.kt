@@ -1,6 +1,6 @@
-package com.aperture_science.city_lens_api
+package com.aperture_science.city_lens_api.mascota
 
-data class Mascota(
+data class MascotaBody(
     val tipo: String = "",
     val name: String = "",
     val peso: String = ""

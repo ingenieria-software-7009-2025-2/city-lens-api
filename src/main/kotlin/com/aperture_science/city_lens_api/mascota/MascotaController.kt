@@ -1,4 +1,4 @@
-package com.aperture_science.city_lens_api
+package com.aperture_science.city_lens_api.mascota
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
