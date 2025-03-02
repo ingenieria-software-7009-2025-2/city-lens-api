@@ -65,3 +65,8 @@ CREATE TABLE Moderation (
         )
     )
 );
+
+CREATE TABLE Token (
+	token_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	token TEXT UNIQUE NOT NULL,
+)
