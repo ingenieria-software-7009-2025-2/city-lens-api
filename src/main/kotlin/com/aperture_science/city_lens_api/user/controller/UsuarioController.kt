@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.aperture_science.city_lens_api.util.HashUtil
 import jakarta.persistence.EntityManager
+import java.util.UUID
 
 @RestController
 @RequestMapping
@@ -36,6 +37,7 @@ class UsuarioController {
             user= loginUser
         )
         //Save the token in the database
+        em.transaction.begin()
         em.persist(response.token)
         em.transaction.commit()
         em.close()
@@ -45,6 +47,7 @@ class UsuarioController {
     @PostMapping("/v1/users/register")
     fun Register(@RequestBody userCredentials: UsuarioRegisterBody): ResponseEntity<Usuario> {
         val loginUser = Usuario(
+            id= UUID.randomUUID(),
             firstName = userCredentials.first_name,
             lastName = userCredentials.last_name,
             email = userCredentials.email,
@@ -52,6 +55,7 @@ class UsuarioController {
         )
         //Due to possible multithreading, we need to create a new EntityManager instance
         val entityManager= getEntityManager()
+        entityManager.transaction.begin()
         entityManager.persist(loginUser)
         entityManager.transaction.commit()
         entityManager.close()
@@ -68,6 +72,7 @@ class UsuarioController {
             firstName = "Paquito",
             email = "paquito@example.com",
             password="123456",
+            id= UUID.randomUUID(),
         )
         )
     }
