@@ -8,10 +8,15 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 class CityLensApiApplication
 
+/**
+ * Función main del proyecto. Basta con inicializar el proyecto
+ * desde esta ubicación en IntelliJ para poder ejecutarlo.
+ */
 fun main(args: Array<String>) {
-	//Starts the Entity Manager Factory
-	val emf = Persistence.createEntityManagerFactory("city_lens");
-	//Sets the Entity Manager Factory in the EntityManagerFactoryInstance utility class for easy access
-	EntityManagerFactoryInstance.entityManagerFactory = emf;
-	runApplication<CityLensApiApplication>(*args)
+    //Inicializa EntityManagerFactory.
+    val emf = Persistence.createEntityManagerFactory("city_lens")
+
+    //Establece EntityManagerFactory en EntityManagerFactoryInstance para facilitar el acceso.
+    EntityManagerFactoryInstance.entityManagerFactory = emf
+    runApplication<CityLensApiApplication>(*args)
 }
