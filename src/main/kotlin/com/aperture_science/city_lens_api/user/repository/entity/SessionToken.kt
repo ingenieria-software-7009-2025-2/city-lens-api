@@ -11,13 +11,13 @@ data class SessionToken(
     var token: String = "",
     @ManyToOne
     @JoinColumn(name = "user_id")
-    val userID: Long
+    val userID: Usuario
 ) {
     companion object {
         fun createToken(user: Usuario): SessionToken {
             return SessionToken(
                 token= HashUtil.hash(user.email + System.currentTimeMillis()),
-                userID = user.id
+                userID = user
             )
         }
     }
