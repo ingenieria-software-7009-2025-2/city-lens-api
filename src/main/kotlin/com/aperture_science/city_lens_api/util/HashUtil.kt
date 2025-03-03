@@ -1,11 +1,18 @@
 package com.aperture_science.city_lens_api.util
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import kotlin.experimental.and
 
+/**
+ * Clase que usada para generar los
+ */
 class HashUtil {
-    //Hash function to hash a string
     companion object {
+        /**
+         * Genera un hash dado un string.
+         * @return string hasheado en SHA-256
+         */
         private fun generateHash(value: String): String {
             try {
                 val messageDigest = MessageDigest.getInstance("SHA-256")
@@ -19,6 +26,11 @@ class HashUtil {
                 throw RuntimeException(e)
             }
         }
+
+        /**
+         * Call to Action para generateHash()
+         * @return String hasheado en SHA-256.
+         */
         fun hash(value: String): String {
             return generateHash(value)
         }
