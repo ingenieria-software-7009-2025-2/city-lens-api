@@ -38,7 +38,7 @@ class UsuarioController {
         )
         //Save the token in the database
         em.transaction.begin()
-        em.persist(response.token)
+        em.persist(loginUser)
         em.transaction.commit()
         em.close()
         //finally return the response
