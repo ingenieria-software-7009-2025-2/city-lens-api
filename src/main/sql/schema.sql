@@ -1,4 +1,4 @@
-CREATE TABLE User (
+CREATE TABLE Users (
     user_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE Report (
     resolutionDate TIMESTAMP,
     image_UUID UUID,
 
-    FOREIGN KEY (user_UUID) REFERENCES User(user_UUID) ON DELETE CASCADE,
+    FOREIGN KEY (user_UUID) REFERENCES Users(user_UUID) ON DELETE CASCADE,
     FOREIGN KEY (location_UUID) REFERENCES Location(location_UUID) ON DELETE SET NULL,
     FOREIGN KEY (image_UUID) REFERENCES Image(image_UUID) ON DELETE SET NULL
 );
@@ -46,9 +46,24 @@ CREATE TABLE Notification (
     message TEXT NOT NULL,
     send_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_UUID) REFERENCES User(user_UUID) ON DELETE CASCADE,
+    FOREIGN KEY (user_UUID) REFERENCES Users(user_UUID) ON DELETE CASCADE,
     FOREIGN KEY (report_UUID) REFERENCES Report(report_UUID) ON DELETE CASCADE
 );
+
+
+-- PostreSQL doesn't exactly the CHECK subqueries so we'll need to add
+-- a function for it. Then, use it as part of a trigger. 
+CREATE OR REPLACE FUNCTION enforce_moderator_role()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM Users WHERE user_UUID = NEW.user_UUID AND role = 'moderator'
+    ) THEN
+        RAISE EXCEPTION 'Only users with role "moderator" can moderate reports';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE Moderation (
     moderation_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -57,16 +72,15 @@ CREATE TABLE Moderation (
     moderation_report TEXT NOT NULL,
     moderation_changes_applied TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_UUID) REFERENCES User(user_UUID) ON DELETE CASCADE,
-    FOREIGN KEY (report_UUID) REFERENCES Report(report_UUID) ON DELETE CASCADE,
-    CONSTRAINT check_moderator_role CHECK (
-        EXISTS (
-            SELECT 1 FROM User WHERE User.user_UUID = Moderation.user_UUID AND User.role = 'moderator'
-        )
-    )
+    FOREIGN KEY (user_UUID) REFERENCES Users(user_UUID) ON DELETE CASCADE,
+    FOREIGN KEY (report_UUID) REFERENCES Report(report_UUID) ON DELETE CASCADE
 );
+
+CREATE TRIGGER check_moderator_before_insert
+BEFORE INSERT ON Moderation
+FOR EACH ROW EXECUTE FUNCTION enforce_moderator_role();
 
 CREATE TABLE Token (
 	token_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	token TEXT UNIQUE NOT NULL,
-)
+	token TEXT UNIQUE NOT NULL
+);
