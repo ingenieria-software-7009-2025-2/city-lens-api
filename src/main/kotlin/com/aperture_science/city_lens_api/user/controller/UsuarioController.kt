@@ -106,7 +106,7 @@ class UsuarioController {
         em.close()
         return ResponseEntity.ok(user)
     }
-    @PostMapping("/v1/users/me")
+    @PutMapping("/v1/users/me")
     fun PostMyUser(request:HttpServletRequest): ResponseEntity<Usuario> {
         val token = request.getHeader("Authorization")
         val em= getEntityManager()
