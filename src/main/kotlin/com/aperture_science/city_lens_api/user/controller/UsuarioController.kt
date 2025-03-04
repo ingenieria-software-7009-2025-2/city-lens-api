@@ -8,6 +8,7 @@ import com.aperture_science.city_lens_api.user.repository.entity.Usuario
 import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.bind.annotation.*
 import com.aperture_science.city_lens_api.util.HashUtil
 import jakarta.persistence.EntityManager
@@ -31,6 +32,14 @@ class UsuarioController {
             em.close()
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         }
+        // Check if the user already has an active session
+        val existingToken = em.createQuery("SELECT t FROM SessionToken t WHERE t.user.id = :userId", SessionToken::class.java)
+            .setParameter("userId", loginUser.id)
+            .resultList
+        if (existingToken.isNotEmpty()) {
+            em.close()
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        }
         //create the token and return the answer
         val response = UsuarioLoginOutputBody(
             token= SessionToken.createToken(loginUser).token,
@@ -38,7 +47,7 @@ class UsuarioController {
         )
         //Save the token in the database
         em.transaction.begin()
-        em.persist(loginUser)
+        em.persist(response.token)
         em.transaction.commit()
         em.close()
         //finally return the response
@@ -63,18 +72,66 @@ class UsuarioController {
         return ResponseEntity.ok(loginUser)
     }
     @PostMapping("/v1/users/logout")
-    fun Logout(): ResponseEntity<String> {
+    fun Logout(request:HttpServletRequest): ResponseEntity<String> {
+        val token = request.getHeader("Authorization")
+        val em= getEntityManager()
+        val sessionToken = em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token",SessionToken::class.java)
+            .setParameter("token", token)
+            .resultList
+        if (sessionToken.isEmpty()) {
+            em.close()
+            return ResponseEntity("Token no encontrado", HttpStatus.NOT_FOUND)
+        }
+        em.transaction.begin()
+        em.remove(sessionToken[0])
+        em.transaction.commit()
+        em.close()
         return ResponseEntity("Sesion cerrada", HttpStatus.OK)
     }
     @GetMapping("/v1/users/me")
-    fun GetMyUser(): ResponseEntity<Usuario> {
-        return ResponseEntity.ok( Usuario(
-            firstName = "Paquito",
-            email = "paquito@example.com",
-            password="123456",
-            id= UUID.randomUUID(),
+    fun GetMyUser(request:HttpServletRequest): ResponseEntity<Usuario> {
+        val token = request.getHeader("Authorization")
+        val em= getEntityManager()
+        val sessionToken = em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token",SessionToken::class.java)
+            .setParameter("token", token)
+            .resultList
+        if (sessionToken.isEmpty()) {
+            em.close()
+            return ResponseEntity<Usuario>(null, HttpStatus.UNAUTHORIZED)
+        }
+        val userid = sessionToken[0].userID
+        val user= em.createQuery("SELECT u FROM Usuario u WHERE u.id = :id",Usuario::class.java)
+            .setParameter("id", userid)
+            .singleResult
+        em.close()
+        return ResponseEntity.ok(user)
+    }
+    @PutMapping("/v1/users/me")
+    fun PostMyUser(request:HttpServletRequest): ResponseEntity<Usuario> {
+        val token = request.getHeader("Authorization")
+        val em= getEntityManager()
+        val sessionToken = em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token",SessionToken::class.java)
+            .setParameter("token", token)
+            .resultList
+        if (sessionToken.isEmpty()) {
+            em.close()
+            return ResponseEntity(null, HttpStatus.UNAUTHORIZED)
+        }
+        val userid = sessionToken[0].userID
+        val user= em.createQuery("SELECT u FROM Usuario u WHERE u.id = :id",Usuario::class.java)
+            .setParameter("id", userid)
+            .singleResult
+        val updatedUser = user.copy(
+            firstName = request.getParameter("firstName") ?: user.firstName,
+            lastName = request.getParameter("lastName") ?: user.lastName,
+            email = request.getParameter("email") ?: user.email,
+            password = request.getParameter("password")?.let { HashUtil.hash(it) } ?: user.password
         )
-        )
+        em.transaction.begin()
+        em.merge(updatedUser)
+        em.transaction.commit()
+        em.close()
+        return ResponseEntity.ok(updatedUser)
     }
     private fun getEntityManager(): EntityManager {
         return EntityManagerFactoryInstance.entityManagerFactory!!.createEntityManager()
