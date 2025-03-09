@@ -4,7 +4,7 @@ import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import jakarta.persistence.Persistence
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-
+// Foo comment
 @SpringBootApplication
 class CityLensApiApplication
 
