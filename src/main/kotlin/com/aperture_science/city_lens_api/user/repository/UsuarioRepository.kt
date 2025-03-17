@@ -143,7 +143,9 @@ class UsuarioRepository {
                 email = userChanges.email ?: user.email,
                 password = userChanges.password ?: user.password
             )
-            updatedUser.password = HashUtil.hash(updatedUser.password)
+            if (updatedUser.password!=user.password) {
+                updatedUser.password = HashUtil.hash(updatedUser.password)
+            }
             em.transaction.begin()
             em.merge(updatedUser) // Actualiza el usuario en la base de datos
             em.transaction.commit() // Confirma la transacción
