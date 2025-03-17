@@ -99,8 +99,14 @@ class UsuarioRepository {
          */
         fun removeSessionToken(token: SessionToken) {
             val em = getEntityManager()
+            // Todo este codigote es porque se requiere que el valor sea obtenido por el mismo entitymanager
             em.transaction.begin()
-            em.remove(token) // Elimina el token de la base de datos
+            val user = getUserById(token.user)!!
+            // Ejecuta una consulta para buscar tokens asociados al usuario
+            val token = em.createQuery("SELECT t FROM SessionToken t WHERE t.user = :userId", SessionToken::class.java)
+                .setParameter("userId", user.id)
+                .resultList
+            em.remove(token[0]) // Elimina el token de la base de datos
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }
