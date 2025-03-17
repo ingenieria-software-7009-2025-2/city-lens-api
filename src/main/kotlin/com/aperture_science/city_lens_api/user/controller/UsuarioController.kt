@@ -34,8 +34,7 @@ class UsuarioController {
      */
     @PostMapping("/v1/users/login")
     fun Login(@RequestBody userCredentials: UsuarioLoginBody): ResponseEntity<Any?> {
-        val loginUser = UsuarioService.LoginUser(userCredentials.email, userCredentials.password)
-        return ResponseEntity.ok(loginUser)
+        return UsuarioService.LoginUser(userCredentials.email, userCredentials.password)
     }
 
     /**

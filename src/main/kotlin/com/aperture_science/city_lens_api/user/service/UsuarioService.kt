@@ -5,12 +5,12 @@ import com.aperture_science.city_lens_api.UsuarioRegisterBody
 import com.aperture_science.city_lens_api.user.controller.body.UsuarioLoginOutputBody
 import com.aperture_science.city_lens_api.user.controller.body.UsuarioPutMeBody
 import com.aperture_science.city_lens_api.user.repository.UsuarioRepository
-import com.aperture_science.city_lens_api.user.repository.UsuarioRepository.Companion.updateUsuario
 import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
 import com.aperture_science.city_lens_api.util.HashUtil
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.util.UUID
+
 
 class UsuarioService {
     companion object{
@@ -42,19 +42,24 @@ class UsuarioService {
             val user = UsuarioRepository.getUserByEmail(email)
             //No se puede construir la respuesta fuera debido a que se utilizan distintos codigos de error.
             when(ValidateLogin(email, password)){
+
                 0 -> {
-                    val sessionToken = UsuarioRepository.getUserToken(user!!)
+                    println("Login correcto")
+
                     val UserResponse = UsuarioLoginOutputBody(
-                        token = sessionToken!!.token,
+                        token = SessionToken.createToken(user!!).token,
                         user = user
                     )
+                    UsuarioRepository.PersistSessionToken(SessionToken.createToken(user))
                     return ResponseEntity.ok(UserResponse)
                 }// Contraseña incorrecta
                 1 -> {
+                    println("Contraseña incorrecta")
                     return ResponseEntity.status(401).build()
                 }
                 // Usuario ya tiene una sesión activa
                 2 -> {
+                    println("Usuario ya tiene una sesión activa")
                     return ResponseEntity("Usuario ya tiene una sesión activa", HttpStatus.CONFLICT)
                 }
                 else -> {
@@ -102,15 +107,15 @@ class UsuarioService {
                 return null
             }
             val user = UsuarioRepository.getUserById(sessionToken.user)
-            return updateUsuario(user!!, userChanges)
+            return UsuarioRepository.updateUsuario(user!!, userChanges)
         }
         /**
         * Valida el login de un usuario
         * @param email Email del usuario
         * @param password Contraseña del usuario
         * @return Código de validación
-        * 0 -> Login correcto
-        * 1 -> Contraseña incorrecta
+        * 0 -> Sin conflictos
+        * 1 -> Contraseña incorrecta O Usuario no encontrado
         * 2 -> Usuario ya tiene una sesión activa
          */
         private fun ValidateLogin(email: String, password: String): Int {

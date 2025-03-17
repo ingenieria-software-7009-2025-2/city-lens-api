@@ -6,6 +6,7 @@ import com.aperture_science.city_lens_api.user.repository.entity.Usuario
 import jakarta.persistence.EntityManager
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import java.time.Period
 import java.util.UUID
 import kotlin.collections.isNotEmpty
 
@@ -25,6 +26,13 @@ class UsuarioRepository {
             em.close()
 
 
+        }
+        fun PersistSessionToken(token: SessionToken) {
+            val em = getEntityManager()
+            em.transaction.begin()
+            em.persist(token)
+            em.transaction.commit()
+            em.close()
         }
 
         fun getUserByEmail(email: String): Usuario? {
