@@ -6,6 +6,8 @@ import com.aperture_science.city_lens_api.user.controller.body.UsuarioLoginOutpu
 import com.aperture_science.city_lens_api.user.controller.body.UsuarioPutMeBody
 import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
 import com.aperture_science.city_lens_api.user.repository.entity.Usuario
+import com.aperture_science.city_lens_api.user.service.UsuarioService
+
 import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,41 +33,8 @@ class UsuarioController {
      * @return Respuesta con token de sesión y datos del usuario
      */
     @PostMapping("/v1/users/login")
-    fun Login(@RequestBody userCredentials: UsuarioLoginBody): ResponseEntity<UsuarioLoginOutputBody> {
-        val em = getEntityManager()
-        val loginUser = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario::class.java)
-            .setParameter("email", userCredentials.email)
-            .singleResult
-
-        // Autenticación del usuario, si el código pasa de este punto, la contraseña es correcta
-        if (loginUser.password != HashUtil.hash(userCredentials.password)) {
-            em.close()
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-        }
-        // Comprobar si el usuario ya tiene una sesión activa
-        val existingToken =
-            em.createQuery("SELECT t FROM SessionToken t WHERE t.user = :userId", SessionToken::class.java)
-                .setParameter("userId", loginUser.id)
-                .resultList
-        if (existingToken.isNotEmpty()) {
-            em.close()
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-        }
-
-        val sessionToken = SessionToken.createToken(loginUser)
-        // Creación del token
-        val response = UsuarioLoginOutputBody(
-            token = sessionToken.token,
-            user = loginUser
-        )
-
-        // Almacena el token en la DB
-        em.transaction.begin()
-        em.persist(sessionToken)
-        em.transaction.commit()
-        em.close()
-        // Finalmente, se regresa la respuesta (Se espera sea un 200 OK)
-        return ResponseEntity.ok(response)
+    fun Login(@RequestBody userCredentials: UsuarioLoginBody): ResponseEntity<Any?> {
+        return UsuarioService.LoginUser(userCredentials.email, userCredentials.password)
     }
 
     /**
@@ -76,19 +45,8 @@ class UsuarioController {
      */
     @PostMapping("/v1/users/register")
     fun Register(@RequestBody userCredentials: UsuarioRegisterBody): ResponseEntity<Usuario> {
-        val loginUser = Usuario(
-            id = UUID.randomUUID(),
-            firstName = userCredentials.first_name,
-            lastName = userCredentials.last_name,
-            email = userCredentials.email,
-            password = HashUtil.hash(userCredentials.password),
-        )
-        // Debido al posible multithreading, necesitamos crear una nueva instancia de EntityManager
-        val entityManager = getEntityManager()
-        entityManager.transaction.begin()
-        entityManager.persist(loginUser)
-        entityManager.transaction.commit()
-        entityManager.close()
+
+        val loginUser = UsuarioService.RegisterUser(userCredentials)
 
         return ResponseEntity.ok(loginUser)
     }
@@ -102,20 +60,23 @@ class UsuarioController {
     @PostMapping("/v1/users/logout")
     fun Logout(request: HttpServletRequest): ResponseEntity<String> {
         val token = request.getHeader("Authorization")
-        val em = getEntityManager()
-        val sessionToken =
-            em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token", SessionToken::class.java)
-                .setParameter("token", token)
-                .resultList
-        if (sessionToken.isEmpty()) {
-            em.close()
-            return ResponseEntity("Token no encontrado", HttpStatus.NOT_FOUND)
+        if (token == null) {
+            return ResponseEntity("Se requiere un Token de Autenticación", HttpStatus.UNAUTHORIZED)
         }
-        em.transaction.begin()
-        em.remove(sessionToken[0])
-        em.transaction.commit()
-        em.close()
-        return ResponseEntity("Sesión cerrada", HttpStatus.OK)
+        val logoutStatus =  UsuarioService.LogoutUser(token)
+        return when(logoutStatus){
+            0 -> {
+                ResponseEntity.ok("Sesión cerrada")
+            }
+
+            1 -> {
+                ResponseEntity("Token de autorización no valido", HttpStatus.UNAUTHORIZED)
+            }
+
+            else -> {
+                ResponseEntity("Error interno", HttpStatus.INTERNAL_SERVER_ERROR)
+            }
+        }
     }
 
     /**
@@ -127,21 +88,14 @@ class UsuarioController {
     @GetMapping("/v1/users/me")
     fun GetMyUser(request: HttpServletRequest): ResponseEntity<Usuario> {
         val token = request.getHeader("Authorization")
-        val em = getEntityManager()
-        val sessionToken =
-            em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token", SessionToken::class.java)
-                .setParameter("token", token)
-                .resultList
-        if (sessionToken.isEmpty()) {
-            em.close()
-            return ResponseEntity<Usuario>(null, HttpStatus.UNAUTHORIZED)
+        return when(val user = UsuarioService.getMe(token)){
+            null -> {
+                ResponseEntity(null, HttpStatus.UNAUTHORIZED)
+            }
+            else -> {
+                ResponseEntity.ok(user)
+            }
         }
-        val userid = sessionToken[0].user
-        val user = em.createQuery("SELECT u FROM Usuario u WHERE u.id = :id", Usuario::class.java)
-            .setParameter("id", userid)
-            .singleResult
-        em.close()
-        return ResponseEntity.ok(user)
     }
 
     /**
@@ -152,29 +106,14 @@ class UsuarioController {
     @PutMapping("/v1/users/me")
     fun PostMyUser(@RequestBody userChanges: UsuarioPutMeBody, request: HttpServletRequest): ResponseEntity<Usuario> {
         val token = request.getHeader("Authorization")
-        val em = getEntityManager()
-        val sessionToken =
-            em.createQuery("SELECT t FROM SessionToken t WHERE t.token = :token", SessionToken::class.java)
-                .setParameter("token", token)
-                .resultList
-        if (sessionToken.isEmpty()) {
-            em.close()
-            return ResponseEntity(null, HttpStatus.UNAUTHORIZED)
+        val updatedUser = UsuarioService.postMe(token, userChanges)
+        // Si el token no corresponde a un usuario, devolvemos un error 401
+        when(updatedUser){
+            null -> {
+                return ResponseEntity(null, HttpStatus.UNAUTHORIZED)
+            }
         }
-        val userid = sessionToken[0].user
-        val user = em.createQuery("SELECT u FROM Usuario u WHERE u.id = :id", Usuario::class.java)
-            .setParameter("id", userid)
-            .singleResult
-        val updatedUser = user.copy(
-            firstName = userChanges.first_name ?: user.firstName,
-            lastName = userChanges.last_name ?: user.lastName,
-            email = userChanges.email ?: user.email,
-            password = userChanges.password ?: user.password
-        )
-        em.transaction.begin()
-        em.merge(updatedUser)
-        em.transaction.commit()
-        em.close()
+        // Si el usuario fue actualizado correctamente, devolvemos el usuario actualizado
         return ResponseEntity.ok(updatedUser)
     }
 
