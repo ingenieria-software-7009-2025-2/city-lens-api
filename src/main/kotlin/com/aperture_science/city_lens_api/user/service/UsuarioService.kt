@@ -3,6 +3,7 @@ package com.aperture_science.city_lens_api.user.service
 import com.aperture_science.city_lens_api.user.repository.entity.Usuario
 import com.aperture_science.city_lens_api.UsuarioRegisterBody
 import com.aperture_science.city_lens_api.user.controller.body.UsuarioLoginOutputBody
+import com.aperture_science.city_lens_api.user.controller.body.UsuarioLoginOutputUser
 import com.aperture_science.city_lens_api.user.controller.body.UsuarioPutMeBody
 import com.aperture_science.city_lens_api.user.repository.UsuarioRepository
 import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
@@ -48,7 +49,13 @@ class UsuarioService {
 
                     val UserResponse = UsuarioLoginOutputBody(
                         token = SessionToken.createToken(user!!).token,
-                        user = user
+                        user = UsuarioLoginOutputUser(
+                            id = user.id,
+                            email = user.email,
+                            first_name = user.firstName,
+                            last_name = user.lastName,
+                            role = user.role
+                        )
                     )
                     UsuarioRepository.PersistSessionToken(SessionToken.createToken(user))
                     return ResponseEntity.ok(UserResponse)
