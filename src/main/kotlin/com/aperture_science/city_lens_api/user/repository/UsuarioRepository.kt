@@ -4,10 +4,8 @@ import com.aperture_science.city_lens_api.user.controller.body.UsuarioPutMeBody
 import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
 import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import com.aperture_science.city_lens_api.user.repository.entity.Usuario
+import com.aperture_science.city_lens_api.util.HashUtil
 import jakarta.persistence.EntityManager
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import java.time.Period
 import java.util.UUID
 import kotlin.collections.isNotEmpty
 
@@ -145,7 +143,9 @@ class UsuarioRepository {
                 email = userChanges.email ?: user.email,
                 password = userChanges.password ?: user.password
             )
-
+            if (updatedUser.password!=user.password) {
+                updatedUser.password = HashUtil.hash(updatedUser.password)
+            }
             em.transaction.begin()
             em.merge(updatedUser) // Actualiza el usuario en la base de datos
             em.transaction.commit() // Confirma la transacción
