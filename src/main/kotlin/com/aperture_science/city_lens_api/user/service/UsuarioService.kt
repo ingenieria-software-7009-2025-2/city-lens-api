@@ -67,7 +67,26 @@ class UsuarioService {
                 // Usuario ya tiene una sesión activa
                 2 -> {
                     println("Usuario ya tiene una sesión activa")
-                    return ResponseEntity("Usuario ya tiene una sesión activa", HttpStatus.CONFLICT)
+                    // Eliminar la sesión activa anterior
+                    val activeToken = UsuarioRepository.getUserToken(user!!)
+                    if (activeToken != null) {
+                        UsuarioRepository.removeSessionToken(activeToken)
+                    }
+                    // Crear una nueva sesión
+                    val newToken = SessionToken.createToken(user)
+                    UsuarioRepository.PersistSessionToken(newToken)
+
+                    val UserResponse = UsuarioLoginOutputBody(
+                        token = newToken.token,
+                        user = UsuarioLoginOutputUser(
+                            id = user.id,
+                            email = user.email,
+                            first_name = user.firstName,
+                            last_name = user.lastName,
+                            role = user.role
+                        )
+                    )
+                    return ResponseEntity.ok(UserResponse)
                 }
                 else -> {
                     // Esto no debería pasar, pero si pasa, devolvemos un error 500.
