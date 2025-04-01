@@ -63,6 +63,7 @@ class UsuarioController {
     )
     fun Login(@RequestBody userCredentials: UsuarioLoginBody): ResponseEntity<Any?> {
         return UsuarioService.LoginUser(userCredentials.email, userCredentials.password)
+
     }
 
     /**
@@ -148,8 +149,12 @@ class UsuarioController {
             "Se requiere un Token de Autenticación",
             HttpStatus.UNAUTHORIZED
         )
+        println("Token eliminacion: $token");
         return when (UsuarioService.LogoutUser(token)) {
-            0 -> ResponseEntity.ok("Sesión cerrada")
+            0 -> {
+                println("Hola");
+                ResponseEntity.ok("Sesión cerrada")}
+
             1 -> ResponseEntity("Token de autorización no válido", HttpStatus.UNAUTHORIZED)
             else -> ResponseEntity("Error interno", HttpStatus.INTERNAL_SERVER_ERROR)
         }
