@@ -17,8 +17,8 @@ import java.util.*
 class ReportService{
     companion object {
 
-        fun createReport(reportCreateBody: ReportCreateBody, Token: String ): ReportOutputBody {
-            val user = UsuarioRepository.getUserByToken(Token) ?: throw Exception("User not found")
+        fun createReport(reportCreateBody: ReportCreateBody, token: String ): ReportOutputBody {
+            val user = UsuarioRepository.getUserByToken(token) ?: throw Exception("User not found")
             val location = Location (
                 locationId = 0, //Debido a que el ID es autogenerado, se asigna un valor temporal
                 latitude = reportCreateBody.latitude,
@@ -41,7 +41,7 @@ class ReportService{
                 userUUID = user.id,
                 title = reportCreateBody.title,
                 description = reportCreateBody.description,
-                status = "Active",
+                status = "open",
                 locationID = locationId,
                 creationDate = LocalDateTime.now(),
                 resolutionDate = null,
@@ -61,8 +61,8 @@ class ReportService{
             )
         }
 
-        fun updateReport(id: UUID, reportUpdateBody: ReportUpdateBody): ReportOutputBody? {
-            val existingReport = ReportRepository.getReportById(id) ?: return null
+        fun updateReport(reportUpdateBody: ReportUpdateBody): ReportOutputBody? {
+            val existingReport = ReportRepository.getReportById(reportUpdateBody.id) ?: throw Exception("Report not found")
             val location = getLocationById(existingReport.locationID)
             val updatedReport = existingReport.copy(
                 title = reportUpdateBody.title ?: existingReport.title,

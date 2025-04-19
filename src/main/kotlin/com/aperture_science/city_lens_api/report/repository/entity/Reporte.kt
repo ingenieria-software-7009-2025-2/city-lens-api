@@ -16,7 +16,7 @@ data class Reporte(
     @Column(name = "report_uuid")
     val id: UUID,
 
-    @JoinColumn(name = "user_uuid")
+    @Column(name = "user_uuid")
     val userUUID: UUID,
 
     @Column(name = "title")
@@ -28,7 +28,7 @@ data class Reporte(
     @Column(name = "status")
     val status: String,
 
-    @JoinColumn(name = "location_id")
+    @Column(name = "location_id")
     val locationID: Int,
 
     @Column(name = "creationDate")

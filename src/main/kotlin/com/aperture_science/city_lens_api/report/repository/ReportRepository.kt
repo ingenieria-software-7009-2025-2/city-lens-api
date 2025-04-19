@@ -126,7 +126,7 @@ class ReportRepository {
          */
         fun getLocationById(id: Int): Location? {
             val em = getEntityManager()
-            val location = em.createQuery("SELECT l FROM Localizacion l WHERE l.id = :id", Location::class.java)
+            val location = em.createQuery("SELECT l FROM Location l WHERE l.id = :id", Location::class.java)
                 .setParameter("id", id)
                 .resultList
             em.close() // Cierra el EntityManager
