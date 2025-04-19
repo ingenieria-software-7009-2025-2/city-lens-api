@@ -55,7 +55,7 @@ class UsuarioService {
                             first_name = user.firstName,
                             last_name = user.lastName,
                             role = user.role
-                        )
+                            )
                     )
                     UsuarioRepository.PersistSessionToken(SessionToken.createToken(user))
                     return ResponseEntity.ok(UserResponse)
