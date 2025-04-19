@@ -1,5 +1,6 @@
 package com.aperture_science.city_lens_api.report.controller.body
 
+import com.aperture_science.city_lens_api.report.repository.entity.Location
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -11,7 +12,7 @@ data class ReportOutputBody(
     val title: String, // Título del reporte
     val description: String, // Descripción del incidente
     val status: String, // Estado del reporte
-    val locationId: UUID, // ID de la ubicación asociada
+    val location: Location, // ID de la ubicación asociada
     val creationDate: LocalDateTime, // Fecha de creación del reporte
     val resolutionDate: LocalDateTime? = null, // Fecha de resolución (opcional)
     val imageId: UUID? = null // ID de la imagen asociada (opcional)

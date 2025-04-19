@@ -9,14 +9,11 @@ import jakarta.persistence.*
 @Table(name = "Location")
 data class Location (
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "location_id")
     val locationId: Int,
     val latitude: Double,
     val longitude: Double,
     val direction: String,
     val zipcode: String,
-    val municipality: String,
-
-
-)
+    val municipality: String, )

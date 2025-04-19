@@ -1,6 +1,5 @@
 package com.aperture_science.city_lens_api.report.repository.entity
 
-import com.aperture_science.city_lens_api.location.repository.entity.Localizacion
 import com.aperture_science.city_lens_api.user.repository.entity.Usuario
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -17,7 +16,6 @@ data class Reporte(
     @Column(name = "report_uuid")
     val id: UUID,
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid")
     val userUUID: UUID,
 
@@ -30,7 +28,6 @@ data class Reporte(
     @Column(name = "status")
     val status: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     val locationID: Int,
 
