@@ -14,13 +14,12 @@ import java.util.UUID
 @Table(name = "Report")
 data class Reporte(
     @Id
-    @GeneratedValue
     @Column(name = "report_uuid")
     val id: UUID,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid")
-    val usuario: Usuario,
+    val userUUID: UUID,
 
     @Column(name = "title")
     val title: String,
@@ -32,8 +31,8 @@ data class Reporte(
     val status: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_uuid")
-    val location: Localizacion,
+    @JoinColumn(name = "location_id")
+    val locationID: Int,
 
     @Column(name = "creationDate")
     val creationDate: LocalDateTime,
