@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 @RestController
-@RequestMapping("/api")
+@RequestMapping()
 class ReportController{
     @PostMapping("/v1/report/create")
     fun createReport(@RequestBody reportCreateBody: ReportCreateBody, request: HttpServletRequest ): ResponseEntity<Any> {
