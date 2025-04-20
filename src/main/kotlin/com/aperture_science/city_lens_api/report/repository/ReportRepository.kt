@@ -18,6 +18,7 @@ import java.util.UUID
  */
 class ReportRepository {
     companion object {
+
         fun persistLocation(location: Location):Int{
             val em = getEntityManager()
             em.transaction.begin()
@@ -88,6 +89,27 @@ class ReportRepository {
          * @param report El reporte a eliminar.
          */
         fun deleteReport(report: Reporte) {
+            /*
+         *  Abandonad toda esperanza aquellos que osen adentrarse en este código,
+         *  porque aquí yace la desesperación y el caos absoluto 💀💀.
+         *
+         *  En un intento de eliminar un reporte, me encontré atrapado en un laberinto de errores y frustraciones,
+         *  y durante dos horas de puro sufrimiento, luché contra la misteriosa desaparición de location_id
+         *  en un Report row mientras intentaba su eliminación. Springboot, en su infinita misericordia,
+         *  decidió arrojarme un error porque, aparentemente, el tipo "Int" de Kotlin le resultaba insufrible.
+         *
+         *  ¡Pero esperad! La alternativa, "Integer", tampoco fue bienvenida en tierras de Kotlin,
+         *  y así comenzó un descenso en espiral hacia el abismo de soluciones desesperadas.
+         *
+         *  Al final, en un acto de absoluta rendición, me vi forzado a abandonar toda noción
+         *  de elegancia y buenas prácticas. En lugar de persistir, decidí ejecutar una consulta de datos
+         *  directa para borrar la información manualmente en esta función, sellando mi destino como
+         *  un ser atormentado por malas decisiones y soluciones indignas.
+         *
+         *  Si algún alma valiente llega hasta aquí, que sepa que este código es un monumento al
+         *  dolor de desarrollo y una advertencia para las generaciones futuras:
+         *  A veces, el código limpio es un lujo imposible.
+         */
             val em = getEntityManager()
             em.transaction.begin()
             println("Location ID: ${report.locationID}")
