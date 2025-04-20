@@ -22,7 +22,6 @@ class ReportRepository {
         fun persistLocation(location: Location):Int{
             val em = getEntityManager()
             em.transaction.begin()
-            em.merge(location) // Guarda la ubicación en la base de datos
             em.persist(location) // Guarda la ubicación en la base de datos
             em.flush() // Asegura que la ubicación genere su ID
             val locationId = location.locationId
