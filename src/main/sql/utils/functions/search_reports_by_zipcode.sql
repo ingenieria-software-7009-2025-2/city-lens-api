@@ -13,11 +13,15 @@
  *  - FALSE (por defecto): Orden descendente (reportes más recientes primero).
  *
  * Retorna:
- * - report_uuid (UUID): Identificador único del reporte.
- * - title (VARCHAR(50)): Título del reporte.
- * - status (VARCHAR(20)): Estado actual del reporte.
- * - creationdate (TIMESTAMP): Fecha de creación del reporte.
- * - municipality (VARCHAR(80)): Municipio asociado a la ubicación del reporte.
+ * - report_uuid: UUID del reporte.
+ * - user_uuid: UUID del usuario que creó el reporte.
+ * - title: Título del reporte.
+ * - description: Descripción del reporte.
+ * - status: Estado del reporte (ej. "abierto", "cerrado").
+ * - creationdate: Fecha y hora de creación del reporte.
+ * - resolutiondate: Fecha y hora de resolución del reporte (si aplica).
+ * - location_id: ID de la ubicación asociada al reporte. 
+ * - image_uuid: UUID de la imagen asociada al reporte (si aplica).
  *
  * Ejemplo de uso:
  * SELECT * FROM search_reports_by_zipcode('12345', TRUE);
@@ -30,27 +34,36 @@ CREATE OR REPLACE FUNCTION search_reports_by_zipcode(
     p_zipcode VARCHAR(10),
     p_order_asc BOOLEAN DEFAULT FALSE -- FALSE = más recientes primero
 )
-    RETURNS TABLE
+   RETURNS TABLE
             (
-                report_uuid  UUID,
-                title        VARCHAR(50),
-                status       VARCHAR(20),
+                report_uuid     UUID,
+                user_uuid       UUID,
+                title         VARCHAR(50),
+                description   TEXT,
+                status        VARCHAR(20),
                 creationdate TIMESTAMP,
-                municipality VARCHAR(80)
+                resolutiondate TIMESTAMP,
+                location_id   INT,
+                image_uuid      UUID
             )
 AS
 $$
 BEGIN
     RETURN QUERY
         SELECT r.report_uuid,
+               r.user_uuid::UUID,
                r.title,
+               r.description,
                r.status,
                r.creationdate,
-               l.municipality
+               r.resolutiondate,
+               r.location_id,
+               r.image_uuid
         FROM Report r
                  JOIN Location l USING (location_id)
         WHERE l.zipcode = p_zipcode
-        ORDER BY CASE WHEN p_order_asc THEN r.creationdate END ASC,
-                 CASE WHEN NOT p_order_asc THEN r.creationdate END DESC;
+        ORDER BY r.creationdate 
+                 ASC  WHEN p_order_asc 
+                 DESC WHEN NOT p_order_asc;
 END;
 $$ LANGUAGE plpgsql;

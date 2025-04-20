@@ -95,5 +95,47 @@ class ReportService{
             val report = ReportRepository.getReportById(id) ?: return null
             return report
         }
+        fun listLatestReports(token: String): List<ReportOutputBody> {
+            val user = UsuarioRepository.getUserByToken(token) ?: throw Exception("User not found")
+            val reports = ReportRepository.listLatestReports()
+            var reportOutput = mutableListOf<ReportOutputBody>()
+            for (report in reports) {
+                val location = getLocationById(report.locationID)
+                reportOutput.add(
+                    ReportOutputBody(
+                        id = report.id,
+                        title = report.title,
+                        description = report.description,
+                        status = report.status,
+                        location = location!!,
+                        creationDate = report.creationDate,
+                        resolutionDate = report.resolutionDate,
+                        imageId = report.imageId
+                    )
+                )
+            }
+            return reportOutput
+        }
+        fun listOldestReports(token: String): List<ReportOutputBody> {
+            val user = UsuarioRepository.getUserByToken(token) ?: throw Exception("User not found")
+            val reports = ReportRepository.listOldestReports()
+            var reportOutput = mutableListOf<ReportOutputBody>()
+            for (report in reports) {
+                val location = getLocationById(report.locationID)
+                reportOutput.add(
+                    ReportOutputBody(
+                        id = report.id,
+                        title = report.title,
+                        description = report.description,
+                        status = report.status,
+                        location = location!!,
+                        creationDate = report.creationDate,
+                        resolutionDate = report.resolutionDate,
+                        imageId = report.imageId
+                    )
+                )
+            }
+            return reportOutput
+        }
     }
 }

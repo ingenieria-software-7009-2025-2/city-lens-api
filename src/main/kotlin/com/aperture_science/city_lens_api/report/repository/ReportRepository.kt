@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.UUID
+import kotlin.reflect.typeOf
 
 /**
  * Repositorio para gestionar las operaciones de base de datos relacionadas con los reportes.
@@ -206,6 +207,26 @@ class ReportRepository {
             em.remove(attachedImage[0]) // Elimina la imagen de la base de datos
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
+        }
+        fun listLatestReports(): List<Reporte> {
+            val em = getEntityManager()
+            val reports = em.createNativeQuery("SELECT * FROM get_latest_reports()", Reporte::class.java)
+                .resultList
+            em.close() // Cierra el EntityManager
+            if (reports.isEmpty()) {
+                return emptyList()
+            }
+            return reports as List<Reporte>
+        }
+        fun listOldestReports(): List<Reporte> {
+            val em = getEntityManager()
+            val reports = em.createNativeQuery("SELECT * FROM get_oldest_reports()", Reporte::class.java)
+                .resultList
+            em.close() // Cierra el EntityManager
+            if (reports.isEmpty()) {
+                return emptyList()
+            }
+            return reports as List<Reporte>
         }
     }
 }
