@@ -51,7 +51,7 @@ $$
 BEGIN
     RETURN QUERY
         SELECT r.report_uuid,
-               r.user_uuid::UUID,
+               r.user_uuid,
                r.title,
                r.description,
                r.status,
@@ -62,8 +62,7 @@ BEGIN
         FROM Report r
                  JOIN Location l USING (location_id)
         WHERE l.zipcode = p_zipcode
-        ORDER BY r.creationdate 
-                 ASC  WHEN p_order_asc 
-                 DESC WHEN NOT p_order_asc;
+        ORDER BY CASE WHEN p_order_asc THEN r.creationdate END ASC,
+                 CASE WHEN NOT p_order_asc THEN r.creationdate END DESC;
 END;
 $$ LANGUAGE plpgsql;

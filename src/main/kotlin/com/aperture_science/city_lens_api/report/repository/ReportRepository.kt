@@ -3,13 +3,11 @@ package com.aperture_science.city_lens_api.report.repository
 import com.aperture_science.city_lens_api.report.repository.entity.Location
 import com.aperture_science.city_lens_api.report.repository.entity.Reporte
 import com.aperture_science.city_lens_api.report.repository.entity.Image
-import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
 import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.UUID
-import kotlin.reflect.typeOf
 
 /**
  * Repositorio para gestionar las operaciones de base de datos relacionadas con los reportes.
@@ -221,6 +219,47 @@ class ReportRepository {
         fun listOldestReports(): List<Reporte> {
             val em = getEntityManager()
             val reports = em.createNativeQuery("SELECT * FROM get_oldest_reports()", Reporte::class.java)
+                .resultList
+            em.close() // Cierra el EntityManager
+            if (reports.isEmpty()) {
+                return emptyList()
+            }
+            return reports as List<Reporte>
+        }
+        fun listActiveReports(): List<Reporte> {
+            val em = getEntityManager()
+            val reports = em.createNativeQuery("SELECT * FROM get_active_reports()", Reporte::class.java)
+                .resultList
+            em.close() // Cierra el EntityManager
+            if (reports.isEmpty()) {
+                return emptyList()
+            }
+            return reports as List<Reporte>
+        }
+        fun listRecentlyResolvedReports(): List<Reporte> {
+            val em = getEntityManager()
+            val reports = em.createNativeQuery("SELECT * FROM get_recently_resolved_reports()", Reporte::class.java)
+                .resultList
+            em.close() // Cierra el EntityManager
+            if (reports.isEmpty()) {
+                return emptyList()
+            }
+            return reports as List<Reporte>
+        }
+        fun listReportsByZipcode(zipcode: String, ascending: Boolean): List<Reporte> {
+            val em = getEntityManager()
+            if (ascending) {
+                val reports = em.createNativeQuery("SELECT * FROM search_reports_by_zipcode(:zipcode,TRUE)", Reporte::class.java)
+                    .setParameter("zipcode", zipcode)
+                    .resultList
+                em.close() // Cierra el EntityManager
+                if (reports.isEmpty()) {
+                    return emptyList()
+                }
+                return reports as List<Reporte>
+            }
+            val reports = em.createNativeQuery("SELECT * FROM search_reports_by_zipcode(:zipcode,FALSE)", Reporte::class.java)
+                .setParameter("zipcode", zipcode)
                 .resultList
             em.close() // Cierra el EntityManager
             if (reports.isEmpty()) {

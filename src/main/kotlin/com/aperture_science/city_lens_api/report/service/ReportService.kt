@@ -95,8 +95,7 @@ class ReportService{
             val report = ReportRepository.getReportById(id) ?: return null
             return report
         }
-        fun listLatestReports(token: String): List<ReportOutputBody> {
-            val user = UsuarioRepository.getUserByToken(token) ?: throw Exception("User not found")
+        fun listLatestReports(): List<ReportOutputBody> {
             val reports = ReportRepository.listLatestReports()
             var reportOutput = mutableListOf<ReportOutputBody>()
             for (report in reports) {
@@ -116,9 +115,68 @@ class ReportService{
             }
             return reportOutput
         }
-        fun listOldestReports(token: String): List<ReportOutputBody> {
-            val user = UsuarioRepository.getUserByToken(token) ?: throw Exception("User not found")
+        fun listOldestReports(): List<ReportOutputBody> {
             val reports = ReportRepository.listOldestReports()
+            var reportOutput = mutableListOf<ReportOutputBody>()
+            for (report in reports) {
+                val location = getLocationById(report.locationID)
+                reportOutput.add(
+                    ReportOutputBody(
+                        id = report.id,
+                        title = report.title,
+                        description = report.description,
+                        status = report.status,
+                        location = location!!,
+                        creationDate = report.creationDate,
+                        resolutionDate = report.resolutionDate,
+                        imageId = report.imageId
+                    )
+                )
+            }
+            return reportOutput
+        }
+        fun listActiveReports(): List<ReportOutputBody> {
+            val reports = ReportRepository.listActiveReports()
+            var reportOutput = mutableListOf<ReportOutputBody>()
+            for (report in reports) {
+                val location = getLocationById(report.locationID)
+                reportOutput.add(
+                    ReportOutputBody(
+                        id = report.id,
+                        title = report.title,
+                        description = report.description,
+                        status = report.status,
+                        location = location!!,
+                        creationDate = report.creationDate,
+                        resolutionDate = report.resolutionDate,
+                        imageId = report.imageId
+                    )
+                )
+            }
+            return reportOutput
+        }
+        fun listRecentlyResolvedReports(): List<ReportOutputBody> {
+            val reports = ReportRepository.listRecentlyResolvedReports()
+            var reportOutput = mutableListOf<ReportOutputBody>()
+            for (report in reports) {
+                val location = getLocationById(report.locationID)
+                reportOutput.add(
+                    ReportOutputBody(
+                        id = report.id,
+                        title = report.title,
+                        description = report.description,
+                        status = report.status,
+                        location = location!!,
+                        creationDate = report.creationDate,
+                        resolutionDate = report.resolutionDate,
+                        imageId = report.imageId
+                    )
+                )
+            }
+            return reportOutput
+        }
+        fun listReportsByZipcode(zipcode: String, ascending: Boolean): List<ReportOutputBody> {
+            val reports = ReportRepository.listReportsByZipcode(zipcode, ascending)
             var reportOutput = mutableListOf<ReportOutputBody>()
             for (report in reports) {
                 val location = getLocationById(report.locationID)
