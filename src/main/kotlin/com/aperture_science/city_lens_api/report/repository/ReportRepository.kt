@@ -3,6 +3,7 @@ package com.aperture_science.city_lens_api.report.repository
 import com.aperture_science.city_lens_api.report.repository.entity.Location
 import com.aperture_science.city_lens_api.report.repository.entity.Reporte
 import com.aperture_science.city_lens_api.report.repository.entity.Image
+import com.aperture_science.city_lens_api.user.repository.entity.SessionToken
 import com.aperture_science.city_lens_api.util.EntityManagerFactoryInstance
 import jakarta.persistence.EntityManager
 import java.math.BigDecimal
@@ -20,6 +21,7 @@ class ReportRepository {
         fun persistLocation(location: Location):Int{
             val em = getEntityManager()
             em.transaction.begin()
+            em.merge(location) // Guarda la ubicación en la base de datos
             em.persist(location) // Guarda la ubicación en la base de datos
             em.flush() // Asegura que la ubicación genere su ID
             val locationId = location.locationId
@@ -88,7 +90,17 @@ class ReportRepository {
         fun deleteReport(report: Reporte) {
             val em = getEntityManager()
             em.transaction.begin()
-            em.remove(em.contains(report) ?: em.merge(report)) // Elimina el reporte de la base de datos
+            println("Location ID: ${report.locationID}")
+            if (report.imageId!=null){
+                val image = getImageById(report.imageId!!)
+                deleteImage(image!!) // Elimina la imagen de la base de datos
+            }
+            println("Location ID: ${report.locationID}")
+            val location= getLocationById(report.locationID)
+            deleteLocation(location!!) // Elimina la ubicación de la base de datos
+            em.createQuery("DELETE FROM Reporte r WHERE r.id = :id")
+                .setParameter("id", report.id)
+                .executeUpdate()
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }
@@ -132,6 +144,14 @@ class ReportRepository {
             em.close() // Cierra el EntityManager
             return if (location.isNotEmpty()) location[0] else null
         }
+        fun getImageById(id: UUID): Image? {
+            val em = getEntityManager()
+            val image = em.createQuery("SELECT i FROM Image i WHERE i.id = :id", Image::class.java)
+                .setParameter("id", id)
+                .resultList
+            em.close() // Cierra el EntityManager
+            return if (image.isNotEmpty()) image[0] else null
+        }
         fun persistImage(image: Image):UUID {
             val em = getEntityManager()
             em.transaction.begin()
@@ -150,7 +170,19 @@ class ReportRepository {
         fun deleteLocation(location: Location) {
             val em = getEntityManager()
             em.transaction.begin()
-            em.remove(em.contains(location) ?: em.merge(location)) // Elimina la ubicación de la base de datos
+            em.createQuery("DELETE FROM Location l WHERE l.id = :id")
+                .setParameter("id", location.locationId)
+                .executeUpdate()
+            em.transaction.commit() // Confirma la transacción
+            em.close() // Cierra el EntityManager
+        }
+        fun deleteImage(image: Image) {
+            val em = getEntityManager()
+            em.transaction.begin()
+            val attachedImage = em.createQuery("SELECT i FROM Image i WHERE i.id = :id", Image::class.java)
+                .setParameter("id", image.id)
+                .resultList
+            em.remove(attachedImage[0]) // Elimina la imagen de la base de datos
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }

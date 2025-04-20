@@ -62,7 +62,7 @@ class ReportService{
         }
 
         fun updateReport(reportUpdateBody: ReportUpdateBody): ReportOutputBody? {
-            val existingReport = ReportRepository.getReportById(reportUpdateBody.id) ?: throw Exception("Report not found")
+            val existingReport = ReportRepository.getReportById(reportUpdateBody.id) ?: return null
             val location = getLocationById(existingReport.locationID)
             val updatedReport = existingReport.copy(
                 title = reportUpdateBody.title ?: existingReport.title,

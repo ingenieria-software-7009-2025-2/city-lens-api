@@ -23,11 +23,11 @@ CREATE TABLE Users
 CREATE TABLE Location
 (
     location_id  SERIAL PRIMARY KEY,
-    latitude     DECIMAL(10, 7) NOT NULL,
-    longitude    DECIMAL(10, 7) NOT NULL,
+    latitude     DECIMAL(10, 7),
+    longitude    DECIMAL(10, 7),
     direction    TEXT,
     zipCode      VARCHAR(10),
-    municipality VARCHAR(80)    NOT NULL
+    municipality VARCHAR(80)
 );
 
 /**
@@ -37,7 +37,7 @@ CREATE TABLE Location
 CREATE TABLE Image
 (
     image_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    image_URL  TEXT NOT NULL
+    image_URL  TEXT
 );
 
 /**
@@ -46,11 +46,11 @@ CREATE TABLE Image
 CREATE TABLE Report
 (
     report_UUID    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_UUID      UUID                                                                      NOT NULL,
-    title          VARCHAR(50)                                                               NOT NULL,
-    description    TEXT                                                                      NOT NULL,
-    status         VARCHAR(20) CHECK (status IN ('open', 'in review', 'resolved', 'closed')) NOT NULL,
-    location_id    INT                                                                       NOT NULL,
+    user_UUID      UUID,
+    title          VARCHAR(50),
+    description    TEXT,
+    status         VARCHAR(20) CHECK (status IN ('open', 'in review', 'resolved', 'closed')),
+    location_id    INT,
     creationDate   TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     resolutionDate TIMESTAMP,
     image_UUID     UUID,
@@ -85,9 +85,9 @@ CREATE TABLE Notification
 CREATE TABLE Moderation
 (
     moderation_UUID            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_UUID                  UUID NOT NULL,
-    report_UUID                UUID NOT NULL,
-    moderation_report          TEXT NOT NULL,
+    user_UUID                  UUID,
+    report_UUID                UUID,
+    moderation_report          TEXT,
     moderation_changes_applied TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_UUID) REFERENCES Users (user_UUID) ON DELETE CASCADE,
