@@ -153,6 +153,13 @@ class UsuarioRepository {
 
             return updatedUser
         }
+        fun getUserByToken(token: String): Usuario? {
+            val sessionToken = getSessionToken(token)
+            if (sessionToken == null) {
+                return null
+            }
+            return getUserById(sessionToken.user)
+        }
 
         /**
          * Crea una nueva instancia de EntityManager para operaciones con la base de datos.
