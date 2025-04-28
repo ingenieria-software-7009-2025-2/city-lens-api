@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="load_everything" type="DatabaseScript" editBeforeRun="true">
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/check_duplicate_location.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/get_active_reports.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/get_latest_reports.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/get_oldest_reports.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/get_recently_resolved_reports.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/search_reports_by_zipcode.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/procedures/create_report.sql" />
+    <script-file value="$PROJECT_DIR$/src/main/sql/utils/functions/enforce_moderation_role.sql" />
+    <script-mode>FILE</script-mode>
+    <data-source id="c7973411-1dea-42ac-8ee1-6c4d173e8928" namespace="database/&quot;city_lens&quot;/schema/&quot;public&quot;" />
+    <method v="2" />
+  </configuration>
+</component>
