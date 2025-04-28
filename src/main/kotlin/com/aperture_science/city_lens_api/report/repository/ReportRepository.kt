@@ -18,7 +18,13 @@ import java.util.UUID
 class ReportRepository {
     companion object {
 
-        fun persistLocation(location: Location):Int{
+        /**
+         * Persiste una ubicación en la base de datos.
+         *
+         * @param location La ubicación a persistir.
+         * @return El ID generado para la ubicación.
+         */
+        fun persistLocation(location: Location): Int {
             val em = getEntityManager()
             em.transaction.begin()
             em.persist(location) // Guarda la ubicación en la base de datos
@@ -28,6 +34,7 @@ class ReportRepository {
             em.close() // Cierra el EntityManager
             return locationId
         }
+
         /**
          * Persiste un reporte en la base de datos.
          *
@@ -124,6 +131,14 @@ class ReportRepository {
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }
+
+        /**
+         * Verifica si existe una ubicación con las coordenadas especificadas.
+         *
+         * @param latitude Latitud de la ubicación.
+         * @param longitude Longitud de la ubicación.
+         * @return `true` si la ubicación existe, `false` en caso contrario.
+         */
         fun LocationExists(latitude: Double, longitude: Double): Boolean {
             val em = getEntityManager()
             // Redondea la latitud y longitud a 2 decimales
@@ -148,8 +163,8 @@ class ReportRepository {
          */
         private fun getEntityManager(): EntityManager {
             return EntityManagerFactoryInstance.entityManagerFactory!!.createEntityManager()
-
         }
+        
         /**
          * Busca una ubicación por su ID.
          *
@@ -164,6 +179,13 @@ class ReportRepository {
             em.close() // Cierra el EntityManager
             return if (location.isNotEmpty()) location[0] else null
         }
+
+        /**
+         * Busca una imagen por su ID.
+         *
+         * @param id El ID de la imagen a buscar.
+         * @return La imagen si se encuentra, o `null` si no existe.
+         */
         fun getImageById(id: UUID): Image? {
             val em = getEntityManager()
             val image = em.createQuery("SELECT i FROM Image i WHERE i.id = :id", Image::class.java)
@@ -172,7 +194,14 @@ class ReportRepository {
             em.close() // Cierra el EntityManager
             return if (image.isNotEmpty()) image[0] else null
         }
-        fun persistImage(image: Image):UUID {
+
+        /**
+         * Persiste una imagen en la base de datos.
+         *
+         * @param image La imagen a persistir.
+         * @return El UUID generado para la imagen.
+         */
+        fun persistImage(image: Image): UUID {
             val em = getEntityManager()
             em.transaction.begin()
             em.persist(image) // Guarda la imagen en la base de datos
@@ -182,6 +211,7 @@ class ReportRepository {
             em.close() // Cierra el EntityManager
             return imageId
         }
+
         /**
          * Elimina una ubicación de la base de datos.
          *
@@ -196,6 +226,12 @@ class ReportRepository {
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }
+
+        /**
+         * Elimina una imagen de la base de datos.
+         *
+         * @param image La imagen a eliminar.
+         */
         fun deleteImage(image: Image) {
             val em = getEntityManager()
             em.transaction.begin()
@@ -206,6 +242,12 @@ class ReportRepository {
             em.transaction.commit() // Confirma la transacción
             em.close() // Cierra el EntityManager
         }
+
+        /**
+         * Obtiene los reportes más recientes ordenados por fecha de creación (descendente).
+         * 
+         * @return Lista de reportes ordenados del más reciente al más antiguo.
+         */
         fun listLatestReports(): List<Reporte> {
             val em = getEntityManager()
             val reports = em.createNativeQuery("SELECT * FROM get_latest_reports()", Reporte::class.java)
@@ -216,6 +258,12 @@ class ReportRepository {
             }
             return reports as List<Reporte>
         }
+
+        /**
+         * Obtiene los reportes más antiguos ordenados por fecha de creación (ascendente).
+         * 
+         * @return Lista de reportes ordenados del más antiguo al más reciente.
+         */
         fun listOldestReports(): List<Reporte> {
             val em = getEntityManager()
             val reports = em.createNativeQuery("SELECT * FROM get_oldest_reports()", Reporte::class.java)
@@ -226,6 +274,12 @@ class ReportRepository {
             }
             return reports as List<Reporte>
         }
+
+        /**
+         * Obtiene los reportes que están actualmente activos (no resueltos).
+         * 
+         * @return Lista de reportes con estado activo.
+         */
         fun listActiveReports(): List<Reporte> {
             val em = getEntityManager()
             val reports = em.createNativeQuery("SELECT * FROM get_active_reports()", Reporte::class.java)
@@ -236,6 +290,12 @@ class ReportRepository {
             }
             return reports as List<Reporte>
         }
+
+        /**
+         * Obtiene los reportes resueltos recientemente.
+         * 
+         * @return Lista de reportes resueltos ordenados por fecha de resolución.
+         */
         fun listRecentlyResolvedReports(): List<Reporte> {
             val em = getEntityManager()
             val reports = em.createNativeQuery("SELECT * FROM get_recently_resolved_reports()", Reporte::class.java)
@@ -246,6 +306,14 @@ class ReportRepository {
             }
             return reports as List<Reporte>
         }
+
+        /**
+         * Obtiene reportes filtrados por código postal.
+         * 
+         * @param zipcode Código postal para filtrar.
+         * @param ascending Orden ascendente (true) o descendente (false) por fecha.
+         * @return Lista de reportes filtrados por código postal.
+         */
         fun listReportsByZipcode(zipcode: String, ascending: Boolean): List<Reporte> {
             val em = getEntityManager()
             if (ascending) {

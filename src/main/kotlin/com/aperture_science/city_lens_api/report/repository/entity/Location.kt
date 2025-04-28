@@ -11,9 +11,9 @@ data class Location (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "location_id")
-    val locationId: Int,
-    val latitude: Double,
-    val longitude: Double,
-    val direction: String,
-    val zipcode: String,
-    val municipality: String, )
+    val locationId: Int,         // ID único autogenerado
+    val latitude: Double,       // Coordenada de latitud
+    val longitude: Double,      // Coordenada de longitud
+    val direction: String,      // Dirección postal descriptiva
+    val zipcode: String,        // Código postal de la zona
+    val municipality: String, ) // Municipio o división administrativa
