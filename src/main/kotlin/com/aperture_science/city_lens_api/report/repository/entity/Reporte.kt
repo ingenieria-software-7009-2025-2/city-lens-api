@@ -14,29 +14,29 @@ import java.util.UUID
 data class Reporte(
     @Id
     @Column(name = "report_uuid")
-    val id: UUID,
+    val id: UUID,                       // Identificador único del reporte
 
     @Column(name = "user_uuid")
-    val userUUID: UUID,
+    val userUUID: UUID,                 // ID del usuario que creó el reporte
 
     @Column(name = "title")
-    val title: String,
+    val title: String,                  // Título descriptivo del reporte   
 
     @Column(name = "description")
-    val description: String,
+    val description: String,            // Detalles completos del incidente
 
     @Column(name = "status")
-    val status: String,
+    val status: String,                 // Estado actual (abierto/cerrado/en progreso)
 
     @Column(name = "location_id")
-    val locationID: Int,
+    val locationID: Int,                // Referencia a la ubicación física
 
     @Column(name = "creationDate")
-    val creationDate: LocalDateTime,
+    val creationDate: LocalDateTime,    // Fecha de creación del reporte
 
     @Column(name = "resolutionDate")
-    val resolutionDate: LocalDateTime?,
+    val resolutionDate: LocalDateTime?,     // Fecha de cierre (null si no resuelto)
 
     @Column(name = "image_uuid")
-    val imageId: UUID?=null
+    val imageId: UUID?=null             // Referencia opcional a imagen adjunta
 )
