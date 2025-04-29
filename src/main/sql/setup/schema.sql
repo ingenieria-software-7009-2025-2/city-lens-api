@@ -98,14 +98,8 @@ CREATE TABLE Moderation
   Token será la tabla en la que se almacenen los token de login
   de los usuarios.
  */
-<<<<<<< HEAD
-CREATE TABLE Token (
-	token_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	token TEXT UNIQUE NOT NULL
-=======
 CREATE TABLE Token
 (
     token_UUID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     token      TEXT UNIQUE NOT NULL
->>>>>>> 40da10a (fix: ajustes a los atributos de la bd para gestion correcta de reportes.)
 );

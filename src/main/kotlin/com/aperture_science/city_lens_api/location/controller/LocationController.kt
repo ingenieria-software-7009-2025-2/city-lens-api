@@ -15,7 +15,7 @@ import java.util.UUID
  */
 @RestController
 @RequestMapping
-@Tag(name = "Location- controller", description = "Operaciones para crear, consultar, actualizar y eliminar ubicaciones dentro del sistema.")
+@Tag(name = "Location", description = "Operaciones para crear, consultar, actualizar y eliminar ubicaciones dentro del sistema.")
 
 class LocationController {
 

@@ -21,7 +21,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping
-@Tag(name = "Report-Controller", description = "Operaciones para crear, actualizar, eliminar y buscar reportes de incidentes en el sistema")
+@Tag(name = "Reportes", description = "Operaciones para crear, actualizar, eliminar y buscar reportes de incidentes en el sistema")
 class ReportController {
     /**
      * Crea un nuevo reporte en el sistema.

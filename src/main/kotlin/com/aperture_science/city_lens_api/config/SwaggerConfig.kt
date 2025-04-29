@@ -16,7 +16,7 @@ class SwaggerConfig {
             .info(
                 Info()
                     .title("City Lens API - Una Aplicación de Reportes Urbanos")
-                    .version("1.1.0")
+                    .version("1.5.0")
                     .description(
                         """
                         _Un Programa de Aperture Science_
