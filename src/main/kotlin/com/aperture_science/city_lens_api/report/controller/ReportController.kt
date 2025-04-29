@@ -162,7 +162,7 @@ class ReportController {
      * @param request Solicitud HTTP con el token en el header "Authorization".
      * @return Confirmación de eliminación o mensaje de error.
      */
-    @DeleteMapping("/v1/report/delete")
+    @PostMapping("/v1/report/delete")
     @Operation(
         summary = "Eliminar un reporte",
         description = "Elimina un reporte de la base de datos utilizando su ID.",
