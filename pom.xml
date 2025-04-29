@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.aperture-science</groupId>
 	<artifactId>city-lens-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.5.0</version>
 	<name>city-lens-api</name>
 	<description>API para City Lens</description>
 	<url/>
