@@ -18,9 +18,13 @@ City Lens es una WebApp de Reportes Urbanos. Esta es la API de la aplicación.
 - PostgreSQL 17.2
 
 ## Notas a la Ejecución
-- En la ruta _src/main/sql_ se encuentra un archivo nombrado _schema.sql_. Este
+- En la ruta _src/main/sql/setup_ se encuentra un archivo nombrado _schema.sql_. Este
 archivo incluye los comandos para la creación de las tablas de la BD. 
-  - Para levantar la BD se puede ocupar el archivo _setup.sql_ incluido en la misma ruta que el archivo anterior. 
+  - Para levantar la BD se puede ocupar el archivo _setup.sql_ incluido en la misma ruta que el archivo anterior.
+- Posterior a levantar la BD es necesario ejecutar los archivos en  _src/main/sql/utils/_ en este orden
+   -    _src/main/sql/utils/functions_
+   -   _src/main/sql/utils/procedures_
+   -   _src/main/sql/utils/triggers_
 - El proyecto contiene configuración de Swagger, por lo que para poder
 observar la documentación de la API creada, se ejecuta el proyecto desde
 IntelliJ y, una vez haya cargado, uno accede a ella usando el [puerto 8080 
