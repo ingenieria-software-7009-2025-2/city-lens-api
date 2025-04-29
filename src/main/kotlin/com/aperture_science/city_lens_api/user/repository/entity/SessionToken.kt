@@ -28,10 +28,13 @@ data class SessionToken(
          * @return [SessionToken] con token hasheado basado en email + timestamp
          */
         fun createToken(user: Usuario): SessionToken {
+            var token = HashUtil.hash(user.email + System.currentTimeMillis());
+            println("Token " + token);
             return SessionToken(
-                token = HashUtil.hash(user.email + System.currentTimeMillis()),
+                token,
                 user = user.id
             )
+
         }
     }
 }
