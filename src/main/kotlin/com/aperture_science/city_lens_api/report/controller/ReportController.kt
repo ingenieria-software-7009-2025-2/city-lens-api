@@ -224,47 +224,7 @@ class ReportController {
      * @param request Solicitud HTTP con el token en el header "Authorization".
      * @return Lista de reportes filtrados o mensaje de error.
      */
-    @GetMapping("/v1/report/search")
-    @Operation(
-        summary = "Buscar reportes por código postal",
-        description = "Permite buscar reportes filtrándolos por código postal y ordenarlos ascendente o descendente.",
-        security = [SecurityRequirement(name = "bearerAuth")],
-        parameters = [
-            Parameter(name = "Authorization", description = "Token de autenticación", required = true)
-        ],
-        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Código postal y orden de búsqueda para los reportes",
-            required = true,
-            content = [io.swagger.v3.oas.annotations.media.Content(
-                mediaType = "application/json",
-                schema = io.swagger.v3.oas.annotations.media.Schema(implementation = ReportSearchBody::class)
-            )]
-        ),
-        responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Reportes obtenidos exitosamente",
-                content = [io.swagger.v3.oas.annotations.media.Content(
-                    mediaType = "application/json",
-                    schema = io.swagger.v3.oas.annotations.media.Schema(implementation = ReportOutputBody::class)
-                )]
-            ),
-            ApiResponse(
-                responseCode = "400",
-                description = "Parámetros de búsqueda inválidos",
-                content = [io.swagger.v3.oas.annotations.media.Content(
-                    mediaType = "text/plain"
-                )]
-            ),
-            ApiResponse(
-                responseCode = "401",
-                description = "Token de autenticación inválido o ausente",
-                content = [io.swagger.v3.oas.annotations.media.Content(
-                    mediaType = "text/plain"
-                )]
-            )
-        ]
-    )
+    @PostMapping("/v1/report/search")
     fun searchReports(@RequestBody reportSearchBody: ReportSearchBody, request: HttpServletRequest): ResponseEntity<Any> {
         val token = request.getHeader("Authorization") ?: return ResponseEntity(
             "Se requiere un Token de Autenticación",
