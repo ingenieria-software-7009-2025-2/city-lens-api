@@ -8,9 +8,9 @@
         <class>com.aperture_science.city_lens_api.SessionToken</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/city_lens"/>
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="password"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://db:5432/city_lens"/>
+            <property name="jakarta.persistence.jdbc.user" value="cityDev"/>
+            <property name="jakarta.persistence.jdbc.password" value="citylenspass"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -31,3 +31,55 @@ IntelliJ y, una vez haya cargado, uno accede a ella usando el [puerto 8080
 en localhost](http://localhost:8080/swagger-ui/index.html). 
 
 Para unir el frontend, se siguen las instrucciones de [este repositorio](https://github.com/ingenieria-software-7009-2025-2/city-lens-front-end)
+
+## Ejecución del proyecto con Docker Compose
+Este proyecto puede ejecutarse fácilmente usando contenedores con Docker y Docker Compose, lo cual levanta automáticamente:
+
+- Una base de datos PostgreSQL inicializada con los scripts SQL proporcionados.
+
+- El backend (API en Kotlin).
+
+- El frontend (React).
+
+### Estructura esperada
+Asegúrate de posicionar el archivo docker-compose.yml al mismo nivel que los dos repositorios (skops-api y skops-frontend). Por ejemplo:
+```
+.
+├── city-lens-api/
+├── city-lens-front-end/
+└── docker-compose.yml
+```
+Nota: Este archivo debe colocarse fuera de las carpetas de skops-api y skops-frontend.
+
+### Requisitos previos
+Antes de comenzar, asegúrate de tener instalado:
+
+- Docker
+- Docker Compose (ya viene incluido en Docker Desktop)
+
+Para verificar las versiones:
+```
+docker --version
+docker-compose --version
+```
+
+### Pasos para ejecutar el proyecto
+1. Clona ambos repositorios (front y back) en el mismo directorio.
+2. Coloca el archivo docker-compose.yml junto a ambos repositorios, como se muestra arriba.
+3. Desde el mismo nivel donde está docker-compose.yml, ejecuta:
+```
+docker-compose up --build
+```
+Esto realizará las siguientes acciones:
+  1. Inicializará una base de datos PostgreSQL llamada city_lens.
+  2. Ejecutará automáticamente los scripts de inicialización (schema.sql, funciones, procedimientos y triggers) desde city-lens-api/src/main/sql/setup/.
+  3. Levantará el backend en http://localhost:8080.
+  4. Levantará el frontend en http://localhost:5173.
+
+4. Accede a los servicios en las rutas del paso anterior
+
+### Detener los contenedores
+Para detener y limpiar los contenedores:
+```
+docker-compose down -v
+```

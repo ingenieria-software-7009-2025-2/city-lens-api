@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: city_lens
+      POSTGRES_USER: cityDev
+      POSTGRES_PASSWORD: citylenspass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./city-lens-api/src/main/sql/setup:/docker-entrypoint-initdb.d
+
+  backend:
+    build:
+      context: ./city-lens-api
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/city_lens
+      SPRING_DATASOURCE_USERNAME: cityDev
+      SPRING_DATASOURCE_PASSWORD: citylenspass
+
+  frontend:
+    build:
+      context: ./city-lens-front-end
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
