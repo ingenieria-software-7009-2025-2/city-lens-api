@@ -42,14 +42,14 @@ Este proyecto puede ejecutarse fácilmente usando contenedores con Docker y Dock
 - El frontend (React).
 
 ### Estructura esperada
-Asegúrate de posicionar el archivo docker-compose.yml al mismo nivel que los dos repositorios (skops-api y skops-frontend). Por ejemplo:
+Asegúrate de posicionar el archivo docker-compose.yml al mismo nivel que los dos repositorios. Por ejemplo:
 ```
 .
 ├── city-lens-api/
 ├── city-lens-front-end/
 └── docker-compose.yml
 ```
-Nota: Este archivo debe colocarse fuera de las carpetas de skops-api y skops-frontend.
+Nota: Este archivo debe colocarse fuera de las carpetas de api y frontend.
 
 ### Requisitos previos
 Antes de comenzar, asegúrate de tener instalado:
